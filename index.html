@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Đồng hồ</title>
+</head>
+
+<body>
+    <canvas id='canvas' width="500" height="500" style="background:#4d4d4d"></canvas>
+    <script type="text/javascript">
+        var c = document.getElementById('canvas'); // Lấy đối tượng
+        var o = c.getContext("2d"); // Chuyển đổi qua 2d để vẽ canvas
+        var r = c.height / 2; // bán kính 1/2 chiều cao canvas
+        o.translate(r, r); // dịch chuyển tâm về tọa độ (r,r)
+        r = r * 0.9; 
+
+        setInterval(drawClock, 1000); //cứ 1 giây chạy drawClock 1 lần
+        function drawClock(){
+        	drawFace(o,r);
+	        drawNumber(o,r);
+	        drawTime(o,r);
+        }
+
+        function drawFace(o, r) {
+        	o.beginPath(); // vẽ đường mới
+            o.fillStyle = 'white';
+            o.arc(0, 0, r, 0, 2 * Math.PI);
+            o.fill();
+
+            var grd;
+            grd = o.createRadialGradient(0,0,r*0.95,0,0,r*1.05); // tạo màu radialgradient
+            grd.addColorStop(0,'#333');
+            grd.addColorStop(0.5,'white');
+            grd.addColorStop(1,'#333');
+            o.strokeStyle=grd;
+            o.arc(0,0,r,0,2*Math.PI);
+            o.lineWidth=r*0.1;
+            o.stroke();
+
+            o.beginPath(); //vẽ đường mới
+            o.fillStyle='#333';
+            o.arc(0,0,r*0.1,0,2*Math.PI);
+            o.fill();
+        }
+        function drawNumber(o,r){
+        	var num;
+        	var ang;
+        	o.font = r*0.1 + 'px Arial'; //đặt font
+        	o.textBaseline = 'middle'; // canh giữa dòng
+        	o.textAlign = 'center'; // canh giữa cột
+        
+        	for(num=1; num<13; num++){
+        		ang = num*Math.PI/6; // tùy theo số mà góc quay num*Pi/6
+        		o.rotate(ang); // quay 1 góc theo kim đồng hồ
+        		o.translate(0,-r*0.85); // dịch chuyển 1 đoạn ngược trục y 1 đoạn r*0.85
+        		o.rotate(-ang); // quay 1 góc ngược kim đồng hồ (trở về góc trước đó)
+        		o.fillText(num.toString(),0,0); // vẽ chữ
+        		o.rotate(ang); // quay 1 góc theo kim đồng hồ
+        		o.translate(0,r*0.85); // dịch chuyển 1 đoạn theo trục y r*0.85 (trở về vị trí ban đầu)
+        		o.rotate(-ang);// quay 1 góc ngược kim đồng hồ (trở về góc ban đầu)
+        	}
+        }
+        function drawTime(o,r){
+        	var time = new Date(); // lấy thời gian hiện tại
+        	var hour = time.getHours();
+        	var minute = time.getMinutes();
+        	var second = time.getSeconds();
+        	//hour
+        	hour = hour%12;
+        	hour = (hour*Math.PI/6) + // Khong viet hour tren cùng 1 dòng, mỗi giờ cách nhau 30 độ
+        	(minute*Math.PI/(6*60)) + // 1 giờ 30 độ, 1 giờ 60 phút
+        	(second*Math.PI/(6*3600)); // 1 giờ 30 độ, 1 giờ 3600 giây
+        	drawHand(o,hour,r*0.5,r*0.07);
+        	//minute
+        	minute = (minute*Math.PI/30) + // khong viet minute trên cùng 1 dòng, mỗi phut cách nhau 6 độ
+        	(second*Math.PI/(30*60)); // 1 phút 6 độ, 1 phút 60 giây
+        	drawHand(o,minute,r*0.8,r*0.07);
+        	//second
+        	second = second*Math.PI/30; //mỗi giây cách nhau 6 độ
+        	drawHand(o,second,r*0.9,r*0.02);
+        }
+        function drawHand(o,pos,length,width){
+        	o.beginPath(); //vẽ đường mới
+        	o.lineWidth=width;
+        	o.lineCap='round';       	
+        	o.moveTo(0,0);
+        	o.rotate(pos); // quay 1 góc theo kim đồng hồ tùy theo giờ, phút giây
+        	o.lineTo(0,-length);
+        	o.stroke();
+        	o.rotate(-pos); // quay 1 góc ngược kim đồng hồ tùy theo giờ, phút giây (trở về góc ban đầu)
+        }
+    </script>
+</body>
+
+</html>
